@@ -1,2 +1,2 @@
 MartinaAI codebase
-Yellow duck coders
+Yellow duck coders to be engaged for tech side
