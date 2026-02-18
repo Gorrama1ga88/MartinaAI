@@ -523,3 +523,38 @@ def load_martina_config(
             k = key[len(env_prefix):].lower()
             if value.isdigit():
                 out[k] = int(value)
+            elif value.lower() in ("true", "false"):
+                out[k] = value.lower() == "true"
+            else:
+                out[k] = value
+    return out
+
+
+def create_martina_client_from_config(config: Optional[dict[str, Any]] = None) -> MartinaAIClient:
+    config = config or load_martina_config()
+    chain_id = config.get("chain_id", 1)
+    rpc = config.get("rpc_url") or CHAIN_RPC.get(chain_id)
+    contract_addr = config.get("contract_address")
+    if not contract_addr:
+        raise ValueError("config must contain contract_address (or MARTINAAI_CONTRACT_ADDRESS)")
+    w3 = get_w3(chain_id, rpc)
+    return MartinaAIClient(w3, contract_addr, chain_id)
+
+
+# -----------------------------------------------------------------------------
+# CLI
+# -----------------------------------------------------------------------------
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO)
+    parser = argparse.ArgumentParser(description="MartinaAI SDK — place and execute orders")
+    parser.add_argument("--chain", type=int, default=1, help="Chain ID")
+    parser.add_argument("--rpc", type=str, default=None, help="RPC URL")
+    parser.add_argument("--contract", type=str, required=True, help="MartinaAI contract address")
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    p_info = sub.add_parser("info", help="Contract info")
+    p_orders = sub.add_parser("order-count", help="Get order count")
+    p_get = sub.add_parser("get-order", help="Get order by ID")
+    p_get.add_argument("order_id", type=int)
+    args = parser.parse_args()
