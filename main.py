@@ -383,3 +383,38 @@ class MartinaAIClient:
         deadline: Optional[int] = None,
         from_address: Optional[str] = None,
         gas_limit: int = DEFAULT_GAS_LIMIT_SWAP,
+    ) -> dict[str, Any]:
+        deadline = deadline or deadline_from_now()
+        token_in = to_checksum(token_in)
+        token_out = to_checksum(token_out)
+        fn = self._contract.functions.executeSwapDirect(
+            token_in, token_out, amount_in, amount_out_min, deadline
+        )
+        return fn.build_transaction({
+            "from": to_checksum(from_address) if from_address else None,
+            "gas": gas_limit,
+        })
+
+    def place_order(
+        self,
+        token_in: str,
+        token_out: str,
+        amount_in: int,
+        amount_out_min: int,
+        private_key: Optional[str] = None,
+        account: Optional["LocalAccount"] = None,
+        deadline: Optional[int] = None,
+    ) -> int:
+        if account is None and private_key:
+            if Account is None:
+                raise RuntimeError("eth_account not installed")
+            account = Account.from_key(private_key)
+        if account is None:
+            raise ValueError("provide either private_key or account")
+        if self.is_paused():
+            raise RuntimeError("MartinaAI bot is paused")
+        tx = self.build_place_order_tx(
+            token_in, token_out, amount_in, amount_out_min,
+            deadline=deadline, from_address=account.address,
+        )
+        tx.pop("from", None)
