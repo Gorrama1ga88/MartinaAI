@@ -558,3 +558,38 @@ def main() -> None:
     p_get = sub.add_parser("get-order", help="Get order by ID")
     p_get.add_argument("order_id", type=int)
     args = parser.parse_args()
+
+    w3 = get_w3(args.chain, args.rpc)
+    client = MartinaAIClient(w3, args.contract, args.chain)
+
+    if args.cmd == "info":
+        print("operator:", client.get_operator())
+        print("router:", client.get_router())
+        print("treasury:", client.get_treasury())
+        print("vault:", client.get_vault())
+        print("paused:", client.is_paused())
+        print("order_count:", client.get_order_count())
+        print("genesis_block:", client.get_genesis_block())
+    elif args.cmd == "order-count":
+        print(client.get_order_count())
+    elif args.cmd == "get-order":
+        order = client.get_order(args.order_id)
+        print(json.dumps(order.to_dict(), indent=2))
+
+
+if __name__ == "__main__":
+    main()
+
+
+# -----------------------------------------------------------------------------
+# Mock client for tests
+# -----------------------------------------------------------------------------
+
+
+class MockMartinaAIClient:
+    def __init__(self, chain_id: int = 1):
+        self._chain_id = chain_id
+        self._order_count = 0
+        self._orders = {}
+        self._paused = False
+        self._operator = "0x" + "1" * 40
