@@ -768,3 +768,38 @@ def estimate_place_order_gas(
 
 def get_vault_balance(w3: "Web3", contract_address: str, token_address: str) -> int:
     martina = get_martinaai(w3, contract_address)
+    vault_addr = martina.functions.vault().call()
+    return get_token_balance(w3, token_address, vault_addr)
+
+
+# -----------------------------------------------------------------------------
+# Order serialization for persistence / API
+# -----------------------------------------------------------------------------
+
+
+def martina_order_to_json(order: MartinaOrder) -> str:
+    return json.dumps(order.to_dict())
+
+
+def martina_order_from_json(s: str) -> MartinaOrder:
+    d = json.loads(s)
+    return MartinaOrder(
+        order_id=d["order_id"],
+        token_in=d["token_in"],
+        token_out=d["token_out"],
+        amount_in=int(d["amount_in"]),
+        amount_out_min=int(d["amount_out_min"]),
+        deadline=int(d["deadline"]),
+        filled=bool(d["filled"]),
+        cancelled=bool(d["cancelled"]),
+        placed_at_block=int(d["placed_at_block"]),
+    )
+
+
+# -----------------------------------------------------------------------------
+# RPC health check
+# -----------------------------------------------------------------------------
+
+
+def martina_rpc_ok(chain_id: int, rpc_url: Optional[str] = None) -> bool:
+    try:
