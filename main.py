@@ -33,3 +33,38 @@ logger = logging.getLogger("martinaai")
 
 MARTINA_BPS_DENOM = 10000
 MARTINA_MAX_SLIPPAGE_BPS = 100
+MARTINA_MIN_PATH_LEN = 2
+MARTINA_MAX_PATH_LEN = 5
+MARTINA_DOMAIN_TAG_HEX = "0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c"
+DEFAULT_DEADLINE_OFFSET_SEC = 600
+DEFAULT_GAS_LIMIT_ORDER = 400_000
+DEFAULT_GAS_LIMIT_SWAP = 350_000
+
+# MartinaAI contract ABI (order + execute + config)
+MARTINAAI_ABI = [
+    {
+        "inputs": [
+            {"name": "tokenIn", "type": "address"},
+            {"name": "tokenOut", "type": "address"},
+            {"name": "amountIn", "type": "uint256"},
+            {"name": "amountOutMin", "type": "uint256"},
+            {"name": "deadline", "type": "uint256"},
+        ],
+        "name": "placeOrder",
+        "outputs": [{"name": "orderId", "type": "uint256"}],
+        "stateMutability": "nonpayable",
+        "type": "function",
+    },
+    {
+        "inputs": [{"name": "orderId", "type": "uint256"}],
+        "name": "executeOrder",
+        "outputs": [{"name": "amountOut", "type": "uint256"}],
+        "stateMutability": "nonpayable",
+        "type": "function",
+    },
+    {
+        "inputs": [{"name": "orderId", "type": "uint256"}],
+        "name": "cancelOrder",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function",
