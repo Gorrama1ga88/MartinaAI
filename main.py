@@ -173,3 +173,38 @@ class MartinaOrder:
             "token_out": self.token_out,
             "amount_in": self.amount_in,
             "amount_out_min": self.amount_out_min,
+            "deadline": self.deadline,
+            "filled": self.filled,
+            "cancelled": self.cancelled,
+            "placed_at_block": self.placed_at_block,
+        }
+
+
+@dataclass
+class MartinaExecuteResult:
+    order_id: int
+    amount_out: int
+    tx_hash: str
+    success: bool
+    block_number: Optional[int] = None
+    gas_used: Optional[int] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "order_id": self.order_id,
+            "amount_out": self.amount_out,
+            "tx_hash": self.tx_hash,
+            "success": self.success,
+            "block_number": self.block_number,
+            "gas_used": self.gas_used,
+        }
+
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+
+def martina_domain_hash(chain_id: int, contract_address: str) -> bytes:
+    payload = f"MartinaAI_{chain_id}_{contract_address}"
+    return hashlib.sha256(payload.encode()).digest()
