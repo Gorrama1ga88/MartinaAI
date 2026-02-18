@@ -243,3 +243,38 @@ def get_martinaai(w3: "Web3", contract_address: str) -> "Contract":
 def apply_slippage_martina(amount: int, bps: int, denom: int = MARTINA_BPS_DENOM) -> int:
     return amount * (denom - bps) // denom
 
+
+def deadline_from_now(offset_sec: int = DEFAULT_DEADLINE_OFFSET_SEC) -> int:
+    return int(time.time()) + offset_sec
+
+
+def format_amount(amount: int, decimals: int) -> str:
+    return str(Decimal(amount) / (10**decimals))
+
+
+def parse_amount(amount_human: str, decimals: int) -> int:
+    return int(Decimal(amount_human) * (10**decimals))
+
+
+def get_token_decimals(w3: "Web3", token_address: str) -> int:
+    try:
+        c = get_erc20(w3, token_address)
+        return c.functions.decimals().call()
+    except Exception:
+        return 18
+
+
+def get_token_balance(w3: "Web3", token_address: str, account: str) -> int:
+    c = get_erc20(w3, token_address)
+    return c.functions.balanceOf(to_checksum(account)).call()
+
+
+# -----------------------------------------------------------------------------
+# MartinaAI client
+# -----------------------------------------------------------------------------
+
+
+class MartinaAIClient:
+    """Client for MartinaAI trading bot contract."""
+
+    def __init__(
