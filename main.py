@@ -698,3 +698,38 @@ def validate_order_params(
 
 
 MARTINA_CHAIN_NAMES: dict[int, str] = {
+    1: "Ethereum",
+    5: "Goerli",
+    10: "Optimism",
+    137: "Polygon",
+    42161: "Arbitrum One",
+    8453: "Base",
+    56: "BSC",
+    43114: "Avalanche C-Chain",
+}
+
+
+def martina_chain_name(chain_id: int) -> str:
+    return MARTINA_CHAIN_NAMES.get(chain_id, f"Chain {chain_id}")
+
+
+# -----------------------------------------------------------------------------
+# Event topic (MartinaOrderPlaced)
+# -----------------------------------------------------------------------------
+
+
+def martina_order_placed_topic() -> Optional[bytes]:
+    if Web3 is None:
+        return None
+    return Web3.keccak(
+        text="MartinaOrderPlaced(uint256,address,address,uint256,uint256,uint256)"
+    )
+
+
+def martina_order_filled_topic() -> Optional[bytes]:
+    if Web3 is None:
+        return None
+    return Web3.keccak(
+        text="MartinaOrderFilled(uint256,uint256,uint256)"
+    )
+
