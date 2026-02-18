@@ -663,3 +663,38 @@ def fetch_all_orders(client: MartinaAIClient) -> list[MartinaOrder]:
 
 def is_valid_evm_address_martina(addr: str) -> bool:
     if not addr or len(addr) != 42:
+        return False
+    if addr[:2] != "0x":
+        return False
+    try:
+        int(addr[2:], 16)
+        return True
+    except ValueError:
+        return False
+
+
+def validate_order_params(
+    token_in: str,
+    token_out: str,
+    amount_in: int,
+    amount_out_min: int,
+    deadline: int,
+) -> None:
+    if not is_valid_evm_address_martina(token_in):
+        raise ValueError("invalid tokenIn address")
+    if not is_valid_evm_address_martina(token_out):
+        raise ValueError("invalid tokenOut address")
+    if amount_in <= 0:
+        raise ValueError("amountIn must be positive")
+    if amount_out_min < 0:
+        raise ValueError("amountOutMin must be non-negative")
+    if deadline <= int(time.time()):
+        raise ValueError("deadline must be in the future")
+
+
+# -----------------------------------------------------------------------------
+# Chain names
+# -----------------------------------------------------------------------------
+
+
+MARTINA_CHAIN_NAMES: dict[int, str] = {
