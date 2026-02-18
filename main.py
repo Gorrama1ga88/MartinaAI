@@ -593,3 +593,38 @@ class MockMartinaAIClient:
         self._orders = {}
         self._paused = False
         self._operator = "0x" + "1" * 40
+        self._router = "0x" + "2" * 40
+        self._treasury = "0x" + "3" * 40
+        self._vault = "0x" + "4" * 40
+
+    @property
+    def chain_id(self) -> int:
+        return self._chain_id
+
+    def is_paused(self) -> bool:
+        return self._paused
+
+    def get_operator(self) -> str:
+        return self._operator
+
+    def get_router(self) -> str:
+        return self._router
+
+    def get_treasury(self) -> str:
+        return self._treasury
+
+    def get_vault(self) -> str:
+        return self._vault
+
+    def get_order_count(self) -> int:
+        return self._order_count
+
+    def get_order(self, order_id: int) -> MartinaOrder:
+        if order_id not in self._orders:
+            raise ValueError("Order not found")
+        return self._orders[order_id]
+
+    def place_order_mock(self, token_in: str, token_out: str, amount_in: int, amount_out_min: int, deadline: int) -> int:
+        self._order_count += 1
+        self._orders[self._order_count] = MartinaOrder(
+            order_id=self._order_count,
