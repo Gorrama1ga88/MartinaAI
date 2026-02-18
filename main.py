@@ -838,3 +838,38 @@ def fetch_martina_order_placed_logs(
     topic = martina_order_placed_topic()
     if topic is None:
         return []
+    to_block = to_block or w3.eth.block_number
+    try:
+        logs = w3.eth.get_logs({
+            "address": to_checksum(contract_address),
+            "topics": [topic],
+            "fromBlock": from_block,
+            "toBlock": to_block,
+        })
+    except Exception as e:
+        logger.warning("get_logs failed: %s", e)
+        return []
+    out = []
+    for log_entry in logs:
+        try:
+            le = dict(log_entry)
+            topics = le.get("topics", [])
+            if len(topics) < 2:
+                continue
+            order_id = int(topics[1].hex(), 16) if hasattr(topics[1], "hex") else int(topics[1], 16)
+            out.append({"order_id": order_id, "block_number": le.get("blockNumber"), "tx_hash": le.get("transactionHash")})
+        except Exception:
+            continue
+    return out
+
+
+# -----------------------------------------------------------------------------
+# Slippage presets
+# -----------------------------------------------------------------------------
+
+
+def martina_slippage_bps_for_label(label: str) -> int:
+    labels = {"conservative": 25, "default": 50, "aggressive": 100}
+    return labels.get(label.lower(), MARTINA_MAX_SLIPPAGE_BPS)
+
+
