@@ -208,3 +208,38 @@ class MartinaExecuteResult:
 def martina_domain_hash(chain_id: int, contract_address: str) -> bytes:
     payload = f"MartinaAI_{chain_id}_{contract_address}"
     return hashlib.sha256(payload.encode()).digest()
+
+
+def get_w3(chain_id: int, rpc_url: Optional[str] = None) -> "Web3":
+    if Web3 is None:
+        raise RuntimeError("web3 not installed; pip install web3")
+    url = rpc_url or CHAIN_RPC.get(chain_id, "http://127.0.0.1:8545")
+    w3 = Web3(Web3.HTTPProvider(url))
+    if not w3.is_connected():
+        raise ConnectionError(f"Could not connect to RPC: {url}")
+    return w3
+
+
+def to_checksum(addr: str) -> str:
+    if Web3 is None:
+        return addr
+    return Web3.to_checksum_address(addr)
+
+
+def get_contract(w3: "Web3", address: str, abi: list) -> "Contract":
+    if Contract is None:
+        raise RuntimeError("web3 not installed")
+    return w3.eth.contract(address=to_checksum(address), abi=abi)
+
+
+def get_erc20(w3: "Web3", token_address: str) -> "Contract":
+    return get_contract(w3, token_address, ERC20_ABI)
+
+
+def get_martinaai(w3: "Web3", contract_address: str) -> "Contract":
+    return get_contract(w3, contract_address, MARTINAAI_ABI)
+
+
+def apply_slippage_martina(amount: int, bps: int, denom: int = MARTINA_BPS_DENOM) -> int:
+    return amount * (denom - bps) // denom
+
