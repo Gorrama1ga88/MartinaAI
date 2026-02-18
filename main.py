@@ -873,3 +873,38 @@ def martina_slippage_bps_for_label(label: str) -> int:
     return labels.get(label.lower(), MARTINA_MAX_SLIPPAGE_BPS)
 
 
+# -----------------------------------------------------------------------------
+# Token pair validation (no same token)
+# -----------------------------------------------------------------------------
+
+
+def validate_token_pair(token_in: str, token_out: str) -> None:
+    if to_checksum(token_in) == to_checksum(token_out):
+        raise ValueError("tokenIn and tokenOut must differ")
+
+
+# -----------------------------------------------------------------------------
+# Human-readable order summary
+# -----------------------------------------------------------------------------
+
+
+def martina_order_summary(order: MartinaOrder, decimals_in: int = 18, decimals_out: int = 18) -> str:
+    status = "filled" if order.filled else ("cancelled" if order.cancelled else "open")
+    return (
+        f"Order #{order.order_id} {order.token_in[:10]}... -> {order.token_out[:10]}... "
+        f"amount_in={format_amount(order.amount_in, decimals_in)} "
+        f"min_out={format_amount(order.amount_out_min, decimals_out)} "
+        f"deadline={order.deadline} status={status}"
+    )
+
+
+# -----------------------------------------------------------------------------
+# Default deadline offset by chain (some chains have faster blocks)
+# -----------------------------------------------------------------------------
+
+
+MARTINA_DEADLINE_OFFSET_BY_CHAIN: dict[int, int] = {
+    1: 600,
+    5: 300,
+    10: 600,
+    137: 600,
