@@ -348,3 +348,38 @@ class MartinaAIClient:
             token_in, token_out, amount_in, amount_out_min, deadline
         )
         return fn.build_transaction({
+            "from": to_checksum(from_address) if from_address else None,
+            "gas": gas_limit,
+        })
+
+    def build_execute_order_tx(
+        self,
+        order_id: int,
+        from_address: Optional[str] = None,
+        gas_limit: int = DEFAULT_GAS_LIMIT_SWAP,
+    ) -> dict[str, Any]:
+        fn = self._contract.functions.executeOrder(order_id)
+        return fn.build_transaction({
+            "from": to_checksum(from_address) if from_address else None,
+            "gas": gas_limit,
+        })
+
+    def build_cancel_order_tx(
+        self,
+        order_id: int,
+        from_address: Optional[str] = None,
+    ) -> dict[str, Any]:
+        fn = self._contract.functions.cancelOrder(order_id)
+        return fn.build_transaction({
+            "from": to_checksum(from_address) if from_address else None,
+        })
+
+    def build_execute_swap_direct_tx(
+        self,
+        token_in: str,
+        token_out: str,
+        amount_in: int,
+        amount_out_min: int,
+        deadline: Optional[int] = None,
+        from_address: Optional[str] = None,
+        gas_limit: int = DEFAULT_GAS_LIMIT_SWAP,
