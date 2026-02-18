@@ -453,3 +453,38 @@ class MartinaAIClient:
         return MartinaExecuteResult(
             order_id=order_id,
             amount_out=amount_out,
+            tx_hash=tx_hash.hex(),
+            success=success,
+            block_number=receipt.get("blockNumber"),
+            gas_used=receipt.get("gasUsed"),
+        )
+
+    def cancel_order(
+        self,
+        order_id: int,
+        private_key: Optional[str] = None,
+        account: Optional["LocalAccount"] = None,
+    ) -> str:
+        if account is None and private_key:
+            if Account is None:
+                raise RuntimeError("eth_account not installed")
+            account = Account.from_key(private_key)
+        if account is None:
+            raise ValueError("provide either private_key or account")
+        tx = self.build_cancel_order_tx(order_id, from_address=account.address)
+        tx.pop("from", None)
+        signed = account.sign_transaction(tx)
+        tx_hash = self._w3.eth.send_raw_transaction(signed.raw_transaction)
+        self._w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+        return tx_hash.hex()
+
+
+# -----------------------------------------------------------------------------
+# Retry helper
+# -----------------------------------------------------------------------------
+
+
+def with_retry_martina(
+    fn: Callable[[], Any],
+    max_attempts: int = 3,
+    delay: float = 1.0,
