@@ -628,3 +628,38 @@ class MockMartinaAIClient:
         self._order_count += 1
         self._orders[self._order_count] = MartinaOrder(
             order_id=self._order_count,
+            token_in=token_in,
+            token_out=token_out,
+            amount_in=amount_in,
+            amount_out_min=amount_out_min,
+            deadline=deadline,
+            filled=False,
+            cancelled=False,
+            placed_at_block=0,
+        )
+        return self._order_count
+
+
+# -----------------------------------------------------------------------------
+# Batch order fetch
+# -----------------------------------------------------------------------------
+
+
+def fetch_all_orders(client: MartinaAIClient) -> list[MartinaOrder]:
+    count = client.get_order_count()
+    out = []
+    for i in range(1, count + 1):
+        try:
+            out.append(client.get_order(i))
+        except Exception as e:
+            logger.warning("get_order %s failed: %s", i, e)
+    return out
+
+
+# -----------------------------------------------------------------------------
+# Validation
+# -----------------------------------------------------------------------------
+
+
+def is_valid_evm_address_martina(addr: str) -> bool:
+    if not addr or len(addr) != 42:
