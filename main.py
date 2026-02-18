@@ -103,3 +103,38 @@ MARTINAAI_ABI = [
         {"name": "tokenIn", "type": "address"},
         {"name": "tokenOut", "type": "address"},
         {"name": "amountIn", "type": "uint256"},
+        {"name": "amountOutMin", "type": "uint256"},
+        {"name": "deadline", "type": "uint256"},
+        {"name": "filled", "type": "bool"},
+        {"name": "cancelled", "type": "bool"},
+        {"name": "placedAtBlock", "type": "uint256"},
+    ], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "martinaOperator", "outputs": [{"name": "", "type": "address"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "router", "outputs": [{"name": "", "type": "address"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "treasury", "outputs": [{"name": "", "type": "address"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "vault", "outputs": [{"name": "", "type": "address"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "botPaused", "outputs": [{"name": "", "type": "bool"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "orderCounter", "outputs": [{"name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "genesisBlock", "outputs": [{"name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
+]
+
+ERC20_ABI = [
+    {"inputs": [{"name": "account", "type": "address"}], "name": "balanceOf", "outputs": [{"name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [{"name": "spender", "type": "address"}, {"name": "amount", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "stateMutability": "nonpayable", "type": "function"},
+    {"inputs": [], "name": "decimals", "outputs": [{"name": "", "type": "uint8"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "symbol", "outputs": [{"name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [{"name": "owner", "type": "address"}, {"name": "spender", "type": "address"}], "name": "allowance", "outputs": [{"name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
+]
+
+CHAIN_RPC = {
+    1: os.environ.get("ETHEREUM_RPC", "https://eth.llamarpc.com"),
+    5: os.environ.get("GOERLI_RPC", "https://rpc.ankr.com/eth_goerli"),
+    10: os.environ.get("OPTIMISM_RPC", "https://mainnet.optimism.io"),
+    137: os.environ.get("POLYGON_RPC", "https://polygon-rpc.com"),
+    42161: os.environ.get("ARBITRUM_RPC", "https://arb1.arbitrum.io/rpc"),
+    8453: os.environ.get("BASE_RPC", "https://mainnet.base.org"),
+    56: os.environ.get("BSC_RPC", "https://bsc-dataseed.binance.org"),
+    43114: os.environ.get("AVAX_RPC", "https://api.avax.network/ext/bc/C/rpc"),
+}
+
+
