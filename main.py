@@ -313,3 +313,38 @@ class MartinaAIClient:
 
     def get_order_count(self) -> int:
         return self._contract.functions.orderCounter().call()
+
+    def get_genesis_block(self) -> int:
+        return self._contract.functions.genesisBlock().call()
+
+    def get_order(self, order_id: int) -> MartinaOrder:
+        raw = self._contract.functions.getOrder(order_id).call()
+        return MartinaOrder(
+            order_id=order_id,
+            token_in=raw[0],
+            token_out=raw[1],
+            amount_in=raw[2],
+            amount_out_min=raw[3],
+            deadline=raw[4],
+            filled=raw[5],
+            cancelled=raw[6],
+            placed_at_block=raw[7],
+        )
+
+    def build_place_order_tx(
+        self,
+        token_in: str,
+        token_out: str,
+        amount_in: int,
+        amount_out_min: int,
+        deadline: Optional[int] = None,
+        from_address: Optional[str] = None,
+        gas_limit: int = DEFAULT_GAS_LIMIT_ORDER,
+    ) -> dict[str, Any]:
+        deadline = deadline or deadline_from_now()
+        token_in = to_checksum(token_in)
+        token_out = to_checksum(token_out)
+        fn = self._contract.functions.placeOrder(
+            token_in, token_out, amount_in, amount_out_min, deadline
+        )
+        return fn.build_transaction({
