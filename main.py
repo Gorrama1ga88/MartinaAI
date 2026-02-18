@@ -803,3 +803,38 @@ def martina_order_from_json(s: str) -> MartinaOrder:
 
 def martina_rpc_ok(chain_id: int, rpc_url: Optional[str] = None) -> bool:
     try:
+        w3 = get_w3(chain_id, rpc_url)
+        return w3.is_connected()
+    except Exception:
+        return False
+
+
+# -----------------------------------------------------------------------------
+# Block number at deadline (approximate)
+# -----------------------------------------------------------------------------
+
+
+def blocks_until_deadline(w3: "Web3", deadline_ts: int, avg_block_time_sec: float = 12.0) -> int:
+    now = int(time.time())
+    if deadline_ts <= now:
+        return 0
+    sec_remaining = deadline_ts - now
+    return max(0, int(sec_remaining / avg_block_time_sec))
+
+
+# -----------------------------------------------------------------------------
+# Log filtering for MartinaOrderPlaced
+# -----------------------------------------------------------------------------
+
+
+def fetch_martina_order_placed_logs(
+    w3: "Web3",
+    contract_address: str,
+    from_block: int,
+    to_block: Optional[int] = None,
+) -> list[dict[str, Any]]:
+    if Web3 is None:
+        return []
+    topic = martina_order_placed_topic()
+    if topic is None:
+        return []
