@@ -138,3 +138,38 @@ CHAIN_RPC = {
 }
 
 
+class MartinaChain(Enum):
+    MAINNET = 1
+    GOERLI = 5
+    OPTIMISM = 10
+    POLYGON = 137
+    ARBITRUM = 42161
+    BASE = 8453
+    BSC = 56
+    AVALANCHE = 43114
+
+
+# -----------------------------------------------------------------------------
+# Data types
+# -----------------------------------------------------------------------------
+
+
+@dataclass
+class MartinaOrder:
+    order_id: int
+    token_in: str
+    token_out: str
+    amount_in: int
+    amount_out_min: int
+    deadline: int
+    filled: bool
+    cancelled: bool
+    placed_at_block: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "order_id": self.order_id,
+            "token_in": self.token_in,
+            "token_out": self.token_out,
+            "amount_in": self.amount_in,
+            "amount_out_min": self.amount_out_min,
