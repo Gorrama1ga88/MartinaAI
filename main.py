@@ -278,3 +278,38 @@ class MartinaAIClient:
     """Client for MartinaAI trading bot contract."""
 
     def __init__(
+        self,
+        w3: "Web3",
+        contract_address: str,
+        chain_id: Optional[int] = None,
+    ):
+        self._w3 = w3
+        self._chain_id = chain_id or w3.eth.chain_id
+        self._contract_address = to_checksum(contract_address)
+        self._contract = get_martinaai(w3, contract_address)
+
+    @property
+    def chain_id(self) -> int:
+        return self._chain_id
+
+    @property
+    def contract_address(self) -> str:
+        return self._contract_address
+
+    def is_paused(self) -> bool:
+        return self._contract.functions.botPaused().call()
+
+    def get_operator(self) -> str:
+        return self._contract.functions.martinaOperator().call()
+
+    def get_router(self) -> str:
+        return self._contract.functions.router().call()
+
+    def get_treasury(self) -> str:
+        return self._contract.functions.treasury().call()
+
+    def get_vault(self) -> str:
+        return self._contract.functions.vault().call()
+
+    def get_order_count(self) -> int:
+        return self._contract.functions.orderCounter().call()
