@@ -733,3 +733,38 @@ def martina_order_filled_topic() -> Optional[bytes]:
         text="MartinaOrderFilled(uint256,uint256,uint256)"
     )
 
+
+# -----------------------------------------------------------------------------
+# Gas estimation
+# -----------------------------------------------------------------------------
+
+
+def estimate_place_order_gas(
+    client: MartinaAIClient,
+    token_in: str,
+    token_out: str,
+    amount_in: int,
+    amount_out_min: int,
+    from_address: str,
+) -> int:
+    try:
+        tx = client.build_place_order_tx(
+            token_in, token_out, amount_in, amount_out_min,
+            from_address=from_address,
+        )
+        tx["from"] = to_checksum(from_address)
+        tx["gas"] = None
+        est = client._w3.eth.estimate_gas(tx)
+        return est
+    except Exception as e:
+        logger.warning("gas estimation failed: %s", e)
+        return DEFAULT_GAS_LIMIT_ORDER
+
+
+# -----------------------------------------------------------------------------
+# Vault balance helper
+# -----------------------------------------------------------------------------
+
+
+def get_vault_balance(w3: "Web3", contract_address: str, token_address: str) -> int:
+    martina = get_martinaai(w3, contract_address)
