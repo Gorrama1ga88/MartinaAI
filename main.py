@@ -488,3 +488,38 @@ def with_retry_martina(
     fn: Callable[[], Any],
     max_attempts: int = 3,
     delay: float = 1.0,
+    backoff: float = 2.0,
+    exceptions: tuple = (Exception,),
+) -> Any:
+    last_err = None
+    for attempt in range(max_attempts):
+        try:
+            return fn()
+        except exceptions as e:
+            last_err = e
+            if attempt < max_attempts - 1:
+                time.sleep(delay * (backoff ** attempt))
+    raise last_err
+
+
+# -----------------------------------------------------------------------------
+# Config
+# -----------------------------------------------------------------------------
+
+
+def load_martina_config(
+    config_path: Optional[str] = None,
+    env_prefix: str = "MARTINAAI_",
+) -> dict[str, Any]:
+    out = {}
+    if config_path and os.path.isfile(config_path):
+        with open(config_path, "r") as f:
+            try:
+                out = json.load(f)
+            except json.JSONDecodeError:
+                pass
+    for key, value in os.environ.items():
+        if key.startswith(env_prefix):
+            k = key[len(env_prefix):].lower()
+            if value.isdigit():
+                out[k] = int(value)
