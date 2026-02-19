@@ -978,3 +978,28 @@ __all__ = [
     "with_retry_martina",
     "fetch_all_orders",
     "is_valid_evm_address_martina",
+    "validate_order_params",
+    "MARTINA_CHAIN_NAMES",
+    "martina_chain_name",
+    "martina_order_placed_topic",
+    "martina_order_filled_topic",
+    "estimate_place_order_gas",
+    "get_vault_balance",
+    "martina_order_to_json",
+    "martina_order_from_json",
+    "martina_rpc_ok",
+    "blocks_until_deadline",
+    "fetch_martina_order_placed_logs",
+    "martina_slippage_bps_for_label",
+    "validate_token_pair",
+    "martina_order_summary",
+    "MARTINA_DEADLINE_OFFSET_BY_CHAIN",
+    "martina_deadline_offset",
+    "is_operator",
+    "place_orders_batch",
+]
+
+
+def martina_version() -> str:
+    """Return SDK version string for MartinaAI client."""
+    return "1.0.0"
