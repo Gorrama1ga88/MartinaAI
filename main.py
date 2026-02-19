@@ -943,3 +943,38 @@ def place_orders_batch(
     deadline = deadline or deadline_from_now()
     order_ids = []
     for token_in, token_out, amount_in, amount_out_min in orders_spec:
+        oid = client.place_order(
+            token_in, token_out, amount_in, amount_out_min,
+            account=account, deadline=deadline,
+        )
+        order_ids.append(oid)
+        time.sleep(gap_sec)
+    return order_ids
+
+
+# -----------------------------------------------------------------------------
+# Export list
+# -----------------------------------------------------------------------------
+
+__all__ = [
+    "MartinaAIClient",
+    "MockMartinaAIClient",
+    "MartinaOrder",
+    "MartinaExecuteResult",
+    "MartinaChain",
+    "MARTINAAI_ABI",
+    "get_w3",
+    "get_martinaai",
+    "get_erc20",
+    "martina_domain_hash",
+    "apply_slippage_martina",
+    "deadline_from_now",
+    "format_amount",
+    "parse_amount",
+    "get_token_decimals",
+    "get_token_balance",
+    "load_martina_config",
+    "create_martina_client_from_config",
+    "with_retry_martina",
+    "fetch_all_orders",
+    "is_valid_evm_address_martina",
