@@ -908,3 +908,38 @@ MARTINA_DEADLINE_OFFSET_BY_CHAIN: dict[int, int] = {
     5: 300,
     10: 600,
     137: 600,
+    42161: 600,
+    8453: 600,
+    56: 600,
+    43114: 600,
+}
+
+
+def martina_deadline_offset(chain_id: int) -> int:
+    return MARTINA_DEADLINE_OFFSET_BY_CHAIN.get(chain_id, DEFAULT_DEADLINE_OFFSET_SEC)
+
+
+# -----------------------------------------------------------------------------
+# Check if address is operator
+# -----------------------------------------------------------------------------
+
+
+def is_operator(client: MartinaAIClient, address: str) -> bool:
+    return to_checksum(client.get_operator()) == to_checksum(address)
+
+
+# -----------------------------------------------------------------------------
+# Batch place orders (sequential)
+# -----------------------------------------------------------------------------
+
+
+def place_orders_batch(
+    client: MartinaAIClient,
+    orders_spec: list[tuple[str, str, int, int]],
+    account: "LocalAccount",
+    deadline: Optional[int] = None,
+    gap_sec: float = 2.0,
+) -> list[int]:
+    deadline = deadline or deadline_from_now()
+    order_ids = []
+    for token_in, token_out, amount_in, amount_out_min in orders_spec:
